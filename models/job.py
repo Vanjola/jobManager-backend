@@ -13,3 +13,16 @@ class Job(db.Model):
     note=db.Column(db.Text)
     date=db.Column(db.Date,nullable=False)
     is_completed=db.Column(db.Boolean,default=False)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "location": self.location,
+            "material_cost": self.material_cost,
+            "additional_cost": self.additional_cost,
+            "revenue": self.revenue,
+            "note": self.note,
+            "date": self.date.isoformat(),
+            "is_completed": self.is_completed
+        }
