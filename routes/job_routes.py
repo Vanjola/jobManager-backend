@@ -70,8 +70,21 @@ def put_job(id):
 
 @job_routes.route("/api/jobs/<int:id>",methods=["DELETE"])
 def delete_job(id):
-    return f"Hello from delete id:{id}"
+    job=Job.query.get(id)
+    if not job:
+        return jsonify({"error": "Job not found."}), 404
+    db.session.delete(job)
+    db.session.commit()
+
+
+
+    return jsonify({"message": "Job deleted successfully"}),200
 
 @job_routes.route("/api/jobs/<int:id>/done",methods=["PATCH"])
 def patch_job(id):
-    return f"Hello from patch id:{id}"
+    job=Job.query.get(id)
+    if not job:
+        return jsonify({"error": "Job not found"}), 404
+    job.is_completed = True
+    db.session.commit()
+    return jsonify({"message":"Job marked as completed","job":job.to_dict()}), 200
