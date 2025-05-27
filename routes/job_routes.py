@@ -42,11 +42,31 @@ def post_job():
 
 @job_routes.route("/api/jobs/<int:id>",methods=["GET"])
 def get_job(id):
-    return f"Hello from get id: {id}"
+    job=Job.query.get(id)
+    if job:
+        return jsonify(job.to_dict()),200
+    else:
+        return jsonify({"error":"Job not found."}),404
 
 @job_routes.route("/api/jobs/<int:id>",methods=["PUT"])
 def put_job(id):
-    return f"Hello from put id:{id}"
+    data=request.get_json()
+    job=Job.query.get(id)
+    if not job:
+        return jsonify({"error": "Job not found."}),404
+    job.title = data.get("title",job.title)
+    job.location = data.get("location",job.location)
+    job.material_cost = data.get("material_cost",job.material_cost)
+    job.additional_cost = data.get("additional_cost",job.additional_cost)
+    job.revenue = data.get("revenue",job.revenue)
+    job.note = data.get("note",job.note)
+    if "date" in data:
+        job.date = datetime.strptime(data["date"], "%Y-%m-%d").date()
+    job.is_completed = data.get("is_completed",job.is_completed)
+
+    db.session.commit()
+
+    return jsonify(job.to_dict()),200
 
 @job_routes.route("/api/jobs/<int:id>",methods=["DELETE"])
 def delete_job(id):

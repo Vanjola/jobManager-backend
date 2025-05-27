@@ -2,7 +2,7 @@ from flask import Flask
 from config import Config
 from database import db
 from routes.job_routes import job_routes
-from models.job import Job
+
 
 
 app=Flask(__name__)
