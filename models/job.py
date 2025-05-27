@@ -14,15 +14,22 @@ class Job(db.Model):
     date=db.Column(db.Date,nullable=False)
     is_completed=db.Column(db.Boolean,default=False)
 
-    def to_dict(self):
-        return {
+    def to_dict(self,role="guest"):
+        base = {
             "id": self.id,
             "title": self.title,
             "location": self.location,
-            "material_cost": self.material_cost,
-            "additional_cost": self.additional_cost,
-            "revenue": self.revenue,
-            "note": self.note,
             "date": self.date.isoformat(),
-            "is_completed": self.is_completed
+            "is_completed": self.is_completed,
+            "note": self.note
         }
+
+        if role == "admin":
+            base.update({
+                "material_cost": self.material_cost,
+                "additional_cost": self.additional_cost,
+                "revenue": self.revenue
+
+            })
+
+        return base

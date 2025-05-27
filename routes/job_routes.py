@@ -4,17 +4,26 @@ from flask import Blueprint, request, jsonify
 from models.job import Job
 from database import db
 from datetime import datetime
+from flask_jwt_extended import jwt_required,get_jwt
+
 
 job_routes=Blueprint("job_routes",__name__)
 
 @job_routes.route("/api/jobs",methods=["GET"])
+@jwt_required(optional=True)
 def get_jobs():
+    claims = get_jwt()
+    role = claims.get("role", "guest") if claims else "guest"
     jobs=Job.query.all()
-    results=[job.to_dict() for job in jobs]
-    return jsonify(results)
+    results=[job.to_dict(role=role) for job in jobs]
+    return jsonify(results),200
 
 @job_routes.route("/api/jobs",methods=["POST"])
+@jwt_required()
 def post_job():
+    claims = get_jwt()
+    if claims["role"] != "admin":
+        return jsonify({"error": "Access denied"}), 403
     data=request.get_json()
     new_job=Job(
         title=data["title"],
@@ -41,10 +50,13 @@ def post_job():
     }), 201
 
 @job_routes.route("/api/jobs/<int:id>",methods=["GET"])
+@jwt_required(optional=True)
 def get_job(id):
+    claims = get_jwt()
+    role = claims.get("role", "guest") if claims else "guest"
     job=Job.query.get(id)
     if job:
-        return jsonify(job.to_dict()),200
+        return jsonify(job.to_dict(role=role)),200
     else:
         return jsonify({"error":"Job not found."}),404
 
@@ -69,7 +81,11 @@ def put_job(id):
     return jsonify(job.to_dict()),200
 
 @job_routes.route("/api/jobs/<int:id>",methods=["DELETE"])
+@jwt_required()
 def delete_job(id):
+    claims = get_jwt()
+    if claims["role"] != "admin":
+        return jsonify({"error": "Access denied"}), 403
     job=Job.query.get(id)
     if not job:
         return jsonify({"error": "Job not found."}), 404
@@ -81,7 +97,11 @@ def delete_job(id):
     return jsonify({"message": "Job deleted successfully"}),200
 
 @job_routes.route("/api/jobs/<int:id>/done",methods=["PATCH"])
+@jwt_required()
 def patch_job(id):
+    claims = get_jwt()
+    if claims["role"] != "admin":
+        return jsonify({"error": "Access denied"}), 403
     job=Job.query.get(id)
     if not job:
         return jsonify({"error": "Job not found"}), 404

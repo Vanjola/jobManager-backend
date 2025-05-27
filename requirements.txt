@@ -1,0 +1,5 @@
+Flask
+Flask-SQLAlchemy
+Flask-Cors
+flask-jwt-extended
+python-dotenv
