@@ -1,20 +1,12 @@
-from venv import create
+import os
+from dotenv import  load_dotenv
 
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token
 
+load_dotenv()
 
 
-users = {
-    "tata": {
-        "password": "1234",
-        "role": "admin"
-    },
-    "gost": {
-        "password": "1234",
-        "role": "guest"
-    }
-}
 
 
 auth_routes=Blueprint("auth_routes",__name__)
@@ -25,14 +17,14 @@ def login():
     username=data.get("username")
     password=data.get("password")
 
-    user=users.get(username)
 
-    if not user or user["password"]!=password:
+
+    if username!=os.getenv("ADMIN_USERNAME") or password!=os.getenv("ADMIN_PASSWORD"):
         return jsonify({"error":"Invalid credentials"}),401
 
     access_token=create_access_token(
         identity=username,
-        additional_claims={"role":user["role"]}
+        additional_claims={"role":"admin"}
     )
 
     return jsonify({"access_token": access_token}),200

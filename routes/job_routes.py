@@ -61,7 +61,11 @@ def get_job(id):
         return jsonify({"error":"Job not found."}),404
 
 @job_routes.route("/api/jobs/<int:id>",methods=["PUT"])
+@jwt_required()
 def put_job(id):
+    claims = get_jwt()
+    if claims["role"] != "admin":
+        return jsonify({"error": "Access denied"}), 403
     data=request.get_json()
     job=Job.query.get(id)
     if not job:
