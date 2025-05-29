@@ -8,6 +8,10 @@ from flask_jwt_extended import JWTManager
 
 
 app=Flask(__name__)
+CORS(app, origins=[
+    "https://job-manager-frontend.vercel.app",
+    "http://localhost:5173"  # ostavi za development, možeš i obrisati u produkciji
+], supports_credentials=True)
 app.config.from_object(Config)
 db.init_app(app)
 jwt=JWTManager(app)
