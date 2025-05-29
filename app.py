@@ -4,7 +4,7 @@ from database import db
 from routes.auth_routes import auth_routes
 from routes.job_routes import job_routes
 from flask_jwt_extended import JWTManager
-from Flask-Cors import CORS
+from flask_cors import CORS
 
 
 app=Flask(__name__)
